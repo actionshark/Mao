@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,8 +12,31 @@
         android:orientation="horizontal"
         >
 
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="@dimen/bar_size"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical|start"
+            android:singleLine="true"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bar_size"
+        android:orientation="horizontal"
+        >
+
         <EditText
-            android:id="@+id/et_address"
+            android:id="@+id/address"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -21,13 +44,21 @@
             />
 
         <Button
-            android:id="@+id/btn_enter"
+            android:id="@+id/enter"
             android:layout_width="@dimen/bar_size"
             android:layout_height="match_parent"
             android:textAllCaps="false"
             android:text="enter"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="6px"
+        android:background="#ffff00"
+        android:orientation="horizontal"
+        />
 
     <RelativeLayout
         android:id="@+id/vg_content"

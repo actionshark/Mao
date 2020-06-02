@@ -1,4 +1,4 @@
-package com.shk.mao;
+package com.shk.mao.util;
 
 public class UrlUtil {
 	public static String checkUrl(String url) {

@@ -1,4 +1,4 @@
-package com.shk.mao;
+package com.shk.mao.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -16,8 +16,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.shk.mao.struct.WebViewListener;
+
 public class WebViewUtil {
-	public static WebView createWebView(Context context) {
+	public static WebView createWebView(Context context, WebViewListener listener) {
 		WebView webView = new WebView(context);
 
 		WebSettings ws = webView.getSettings();
@@ -45,21 +47,30 @@ public class WebViewUtil {
 
 		webView.setWebChromeClient(new WebChromeClient() {
 			@Override
-			public void onProgressChanged(WebView webView, int newProgress) {
-				super.onProgressChanged(webView, newProgress);
-				// TODO
+			public void onProgressChanged(WebView webView, int progress) {
+				super.onProgressChanged(webView, progress);
+
+				if (listener != null) {
+					listener.onProgressChanged(webView, progress / 100f);
+				}
 			}
 
 			@Override
 			public void onReceivedTitle(WebView webView, String title) {
 				super.onReceivedTitle(webView, title);
-				// TODO
+
+				if (listener != null) {
+					listener.onReceivedTitle(webView, title);
+				}
 			}
 
 			@Override
 			public void onReceivedIcon(WebView webView, Bitmap icon) {
 				super.onReceivedIcon(webView, icon);
-				// TODO
+
+				if (listener != null) {
+					listener.onReceivedIcon(webView, icon);
+				}
 			}
 
 			@Override
