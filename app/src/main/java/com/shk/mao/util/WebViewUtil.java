@@ -120,12 +120,22 @@ public class WebViewUtil {
 					}
 				}
 
-				return false;
+				return true;
 			}
 
 			@Override
 			public void onReceivedSslError(WebView webView, SslErrorHandler handler, SslError error) {
 				handler.proceed();
+			}
+
+			@Override
+			public void onPageStarted(WebView webView, String url, Bitmap icon) {
+				super.onPageStarted(webView, url, icon);
+
+				if (listener != null) {
+					listener.onUrlChanged(webView, url);
+					listener.onReceivedIcon(webView, icon);
+				}
 			}
 		});
 

@@ -1,10 +1,12 @@
 package com.shk.mao.ui;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,11 +28,10 @@ public class MainActivity extends AppCompatActivity {
 	private TextView mTitle;
 
 	private EditText mAddress;
-	private Button mEnter;
 
 	private View mProgress;
 
-	private ViewGroup mContent;
+	private ViewGroup mContainer;
 
 	private List<WebViewItem> mWebViews = new ArrayList<>();
 	private WebViewItem mWebView;
@@ -44,42 +45,51 @@ public class MainActivity extends AppCompatActivity {
 		mTitle = findViewById(R.id.title);
 
 		mAddress = findViewById(R.id.address);
+		mAddress.setSelectAllOnFocus(true);
+		mAddress.setOnEditorActionListener((textView, actionId, event) -> {
+			onInputAddress();
+			return true;
+		});
+		mAddress.setOnFocusChangeListener((view, hasFocus) -> {
+			if (!hasFocus) {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				if (imm != null) {
+					imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				}
+			}
+		});
 
-		mEnter = findViewById(R.id.enter);
-		mEnter.setOnClickListener((view) -> {
-			String url = mAddress.getText().toString();
-			url = UrlUtil.checkUrl(url);
-			mAddress.setText(url);
-
-			WebViewItem item = getWebView();
-			item.webView.loadUrl(url);
+		findViewById(R.id.go).setOnClickListener((view) -> {
+			onInputAddress();
 		});
 
 		mProgress = findViewById(R.id.progress);
 
-		mContent = findViewById(R.id.vg_content);
-	}
+		mContainer = findViewById(R.id.container);
 
-	private WebViewItem getWebView(WebView webView) {
-		for (WebViewItem item : mWebViews) {
-			if (item.webView == webView) {
-				return item;
-			}
-		}
+		findViewById(R.id.setting).setOnClickListener((view) -> {
+		});
 
-		return null;
-	}
+		findViewById(R.id.page).setOnClickListener((view) -> {
+		});
 
-	private WebViewItem getWebView() {
-		if (mWebView == null) {
-			createWebView();
-		}
-
-		return mWebView;
+		findViewById(R.id.menu).setOnClickListener((view) -> {
+		});
 	}
 
 	private void createWebView() {
 		WebView webView = WebViewUtil.createWebView(this, new WebViewListener() {
+			@Override
+			public void onUrlChanged(WebView webView, String url) {
+				WebViewItem item = getWebView(webView);
+				if (item != null) {
+
+					if (item == mWebView) {
+						mAddress.setText(url);
+					}
+				}
+			}
+
 			@Override
 			public void onProgressChanged(WebView webView, float progress) {
 				WebViewItem item = getWebView(webView);
@@ -87,11 +97,8 @@ public class MainActivity extends AppCompatActivity {
 					item.progress = progress;
 
 					if (item == mWebView) {
-						if (progress == 1f) {
-							progress = 0f;
-						}
-
-						mProgress.setScaleX(progress);
+						float width = mContainer.getWidth() * progress;
+						mProgress.getLayoutParams().width = (int) width;
 					}
 				}
 			}
@@ -123,11 +130,39 @@ public class MainActivity extends AppCompatActivity {
 
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		webView.setLayoutParams(lp);
-		mContent.addView(webView);
+		mContainer.addView(webView);
 
 		WebViewItem item = new WebViewItem();
 		item.webView = webView;
 		mWebViews.add(item);
 		mWebView = item;
+	}
+
+	private WebViewItem getWebView(WebView webView) {
+		for (WebViewItem item : mWebViews) {
+			if (item.webView == webView) {
+				return item;
+			}
+		}
+
+		return null;
+	}
+
+	private WebViewItem getWebView() {
+		if (mWebView == null) {
+			createWebView();
+		}
+
+		return mWebView;
+	}
+
+	private void onInputAddress() {
+		String url = mAddress.getText().toString();
+		url = UrlUtil.checkUrl(url);
+		mAddress.setText(url);
+		mAddress.clearFocus();
+
+		WebViewItem item = getWebView();
+		item.webView.loadUrl(url);
 	}
 }
