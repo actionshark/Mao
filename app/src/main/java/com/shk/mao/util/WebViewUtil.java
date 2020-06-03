@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
@@ -105,8 +106,10 @@ public class WebViewUtil {
 					}
 				}
 
+				Log.d("Mao", "url: " + url);
+
 				if (url != null) {
-					if (url.startsWith("http:") || url.startsWith("https:")) {
+					if (url.startsWith("http://") || url.startsWith("https://")) {
 						return false;
 					}
 				}
@@ -144,5 +147,11 @@ public class WebViewUtil {
 		});
 
 		return webView;
+	}
+
+	public static void destroyWebView(WebView webView) {
+		webView.stopLoading();
+		webView.clearAnimation();
+		webView.destroy();
 	}
 }

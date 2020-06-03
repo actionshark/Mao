@@ -1,6 +1,7 @@
 package com.shk.mao.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,22 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.shk.mao.R;
-import com.shk.mao.struct.WebViewItem;
+import com.shk.mao.struct.Page;
+import com.shk.mao.struct.PageMgr;
 import com.shk.mao.util.UrlUtil;
 import com.shk.mao.struct.WebViewListener;
 import com.shk.mao.util.WebViewUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
+public class ActivityMain extends AppCompatActivity {
 	private ImageView mIcon;
 	private TextView mTitle;
 
@@ -33,12 +31,10 @@ public class MainActivity extends AppCompatActivity {
 
 	private ViewGroup mContainer;
 
-	private List<WebViewItem> mWebViews = new ArrayList<>();
-	private WebViewItem mWebView;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_main);
 
 		mIcon = findViewById(R.id.icon);
@@ -71,20 +67,47 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		findViewById(R.id.page).setOnClickListener((view) -> {
+			Intent intent = new Intent(this, ActivityPage.class);
+			startActivity(intent);
 		});
 
 		findViewById(R.id.menu).setOnClickListener((view) -> {
 		});
+
+		PageMgr.init(this);
 	}
 
-	private void createWebView() {
+	public WebView createWebView() {
 		WebView webView = WebViewUtil.createWebView(this, new WebViewListener() {
 			@Override
-			public void onUrlChanged(WebView webView, String url) {
-				WebViewItem item = getWebView(webView);
-				if (item != null) {
+			public void onReceivedIcon(WebView webView, Bitmap icon) {
+				Page page = PageMgr.getInstance().getPage(webView);
+				if (page != null) {
+					page.icon = icon;
 
-					if (item == mWebView) {
+					if (page == PageMgr.getInstance().getSelectedPage()) {
+						mIcon.setImageBitmap(icon);
+					}
+				}
+			}
+
+			@Override
+			public void onReceivedTitle(WebView webView, String title) {
+				Page page = PageMgr.getInstance().getPage(webView);
+				if (page != null) {
+					page.title = title;
+
+					if (page == PageMgr.getInstance().getSelectedPage()) {
+						mTitle.setText(title);
+					}
+				}
+			}
+
+			@Override
+			public void onUrlChanged(WebView webView, String url) {
+				Page page = PageMgr.getInstance().getPage(webView);
+				if (page != null) {
+					if (page == PageMgr.getInstance().getSelectedPage()) {
 						mAddress.setText(url);
 					}
 				}
@@ -92,37 +115,13 @@ public class MainActivity extends AppCompatActivity {
 
 			@Override
 			public void onProgressChanged(WebView webView, float progress) {
-				WebViewItem item = getWebView(webView);
-				if (item != null) {
-					item.progress = progress;
+				Page page = PageMgr.getInstance().getPage(webView);
+				if (page != null) {
+					page.progress = progress;
 
-					if (item == mWebView) {
+					if (page == PageMgr.getInstance().getSelectedPage()) {
 						float width = mContainer.getWidth() * progress;
 						mProgress.getLayoutParams().width = (int) width;
-					}
-				}
-			}
-
-			@Override
-			public void onReceivedTitle(WebView webView, String title) {
-				WebViewItem item = getWebView(webView);
-				if (item != null) {
-					item.title = title;
-
-					if (item == mWebView) {
-						mTitle.setText(title);
-					}
-				}
-			}
-
-			@Override
-			public void onReceivedIcon(WebView webView, Bitmap icon) {
-				WebViewItem item = getWebView(webView);
-				if (item != null) {
-					item.icon = icon;
-
-					if (item == mWebView) {
-						mIcon.setImageBitmap(icon);
 					}
 				}
 			}
@@ -132,28 +131,25 @@ public class MainActivity extends AppCompatActivity {
 		webView.setLayoutParams(lp);
 		mContainer.addView(webView);
 
-		WebViewItem item = new WebViewItem();
-		item.webView = webView;
-		mWebViews.add(item);
-		mWebView = item;
+		return webView;
 	}
 
-	private WebViewItem getWebView(WebView webView) {
-		for (WebViewItem item : mWebViews) {
-			if (item.webView == webView) {
-				return item;
-			}
-		}
+	public void selectPage(Page page) {
+		page.webView.bringToFront();
 
-		return null;
+		mIcon.setImageBitmap(page.icon);
+
+		mTitle.setText(page.title);
+
+		mAddress.setText(page.webView.getUrl());
+
+		float width = mContainer.getWidth() * page.progress;
+		mProgress.getLayoutParams().width = (int) width;
 	}
 
-	private WebViewItem getWebView() {
-		if (mWebView == null) {
-			createWebView();
-		}
-
-		return mWebView;
+	public void removePage(Page page) {
+		mContainer.removeView(page.webView);
+		WebViewUtil.destroyWebView(page.webView);
 	}
 
 	private void onInputAddress() {
@@ -162,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 		mAddress.setText(url);
 		mAddress.clearFocus();
 
-		WebViewItem item = getWebView();
-		item.webView.loadUrl(url);
+		Page page = PageMgr.getInstance().getSelectedPage();
+		page.webView.loadUrl(url);
 	}
 }

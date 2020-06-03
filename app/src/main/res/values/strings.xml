@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">Mao</string>
+
+    <string name="add">add</string>
+    <string name="back">back</string>
+    <string name="close">close</string>
+    <string name="close_all">close all</string>
     <string name="go">go</string>
-    <string name="setting">setting</string>
-    <string name="page">page</string>
     <string name="menu">menu</string>
+    <string name="title_default">New Page</string>
+    <string name="page">page</string>
+    <string name="setting">setting</string>
 </resources>
