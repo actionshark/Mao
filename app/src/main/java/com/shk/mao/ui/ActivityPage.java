@@ -1,16 +1,12 @@
 package com.shk.mao.ui;
 
 import android.os.Bundle;
-import android.os.strictmode.CleartextNetworkViolation;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 
 import com.shk.mao.R;
 import com.shk.mao.struct.Page;
 import com.shk.mao.struct.PageMgr;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ActivityPage extends AppCompatActivity {
 	private ListView mPages;
