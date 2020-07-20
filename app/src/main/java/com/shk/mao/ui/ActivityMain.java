@@ -31,6 +31,8 @@ public class ActivityMain extends AppCompatActivity {
 
 	private ViewGroup mContainer;
 
+	private PageMgr mPageMgr;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -75,17 +77,18 @@ public class ActivityMain extends AppCompatActivity {
 		});
 
 		PageMgr.init(this);
+		mPageMgr = PageMgr.getInstance();
 	}
 
 	public WebView createWebView() {
 		WebView webView = WebViewUtil.createWebView(this, new WebViewListener() {
 			@Override
 			public void onReceivedIcon(WebView webView, Bitmap icon) {
-				Page page = PageMgr.getInstance().getPage(webView);
+				Page page = mPageMgr.getPage(webView);
 				if (page != null) {
 					page.icon = icon;
 
-					if (page == PageMgr.getInstance().getSelectedPage()) {
+					if (page == mPageMgr.getSelectedPage()) {
 						mIcon.setImageBitmap(icon);
 					}
 				}
@@ -93,11 +96,11 @@ public class ActivityMain extends AppCompatActivity {
 
 			@Override
 			public void onReceivedTitle(WebView webView, String title) {
-				Page page = PageMgr.getInstance().getPage(webView);
+				Page page = mPageMgr.getPage(webView);
 				if (page != null) {
 					page.title = title;
 
-					if (page == PageMgr.getInstance().getSelectedPage()) {
+					if (page == mPageMgr.getSelectedPage()) {
 						mTitle.setText(title);
 					}
 				}
@@ -105,9 +108,9 @@ public class ActivityMain extends AppCompatActivity {
 
 			@Override
 			public void onUrlChanged(WebView webView, String url) {
-				Page page = PageMgr.getInstance().getPage(webView);
+				Page page = mPageMgr.getPage(webView);
 				if (page != null) {
-					if (page == PageMgr.getInstance().getSelectedPage()) {
+					if (page == mPageMgr.getSelectedPage()) {
 						mAddress.setText(url);
 					}
 				}
@@ -115,11 +118,11 @@ public class ActivityMain extends AppCompatActivity {
 
 			@Override
 			public void onProgressChanged(WebView webView, float progress) {
-				Page page = PageMgr.getInstance().getPage(webView);
+				Page page = mPageMgr.getPage(webView);
 				if (page != null) {
 					page.progress = progress;
 
-					if (page == PageMgr.getInstance().getSelectedPage()) {
+					if (page == mPageMgr.getSelectedPage()) {
 						float width = mContainer.getWidth() * progress;
 						mProgress.getLayoutParams().width = (int) width;
 					}
@@ -158,7 +161,7 @@ public class ActivityMain extends AppCompatActivity {
 		mAddress.setText(url);
 		mAddress.clearFocus();
 
-		Page page = PageMgr.getInstance().getSelectedPage();
+		Page page = mPageMgr.getSelectedPage();
 		page.webView.loadUrl(url);
 	}
 }

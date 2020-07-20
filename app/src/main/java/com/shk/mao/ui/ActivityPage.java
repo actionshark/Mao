@@ -9,6 +9,7 @@ import com.shk.mao.struct.Page;
 import com.shk.mao.struct.PageMgr;
 
 public class ActivityPage extends AppCompatActivity {
+	private PageMgr mPageMgr;
 	private ListView mPages;
 	private AdapterPage mAdapter;
 
@@ -17,29 +18,31 @@ public class ActivityPage extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_page);
 
+		mPageMgr = PageMgr.getInstance();
+
 		mAdapter = new AdapterPage(this);
 
 		mPages = findViewById(R.id.pages);
 		mPages.setAdapter(mAdapter);
 		mPages.setOnItemClickListener((parent, view, position, id) -> {
 			Page page = mAdapter.getData().get(position);
-			PageMgr.getInstance().selectPage(page);
+			mPageMgr.selectPage(page);
 			finish();
 		});
 
 		findViewById(R.id.close_all).setOnClickListener((view) -> {
-			int length = PageMgr.getInstance().getPages().size();
+			int length = mPageMgr.getPages().size();
 			for (int i = 0; i < length; i++) {
-				PageMgr.getInstance().removePage(0);
+				mPageMgr.removePage(0);
 			}
 
-			mAdapter.setData(PageMgr.getInstance().getPages());
+			mAdapter.setData(mPageMgr.getPages());
 
 			finish();
 		});
 
 		findViewById(R.id.add).setOnClickListener((view) -> {
-			PageMgr.getInstance().addPage();
+			mPageMgr.addPage();
 			finish();
 		});
 
@@ -47,6 +50,6 @@ public class ActivityPage extends AppCompatActivity {
 			finish();
 		});
 
-		mAdapter.setData(PageMgr.getInstance().getPages());
+		mAdapter.setData(mPageMgr.getPages());
 	}
 }

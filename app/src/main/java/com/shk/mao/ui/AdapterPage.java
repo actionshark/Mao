@@ -17,10 +17,12 @@ import java.util.List;
 
 public class AdapterPage extends BaseAdapter {
 	private Context mContext;
+	PageMgr mPageMgr;
 	private List<Page> mData;
 
 	public AdapterPage(Context context) {
 		mContext = context;
+		mPageMgr = PageMgr.getInstance();
 	}
 
 	public void setData(List<Page> data) {
@@ -60,8 +62,8 @@ public class AdapterPage extends BaseAdapter {
 			view = LayoutInflater.from(mContext).inflate(R.layout.grid_page, null);
 
 			view.findViewById(R.id.close).setOnClickListener((v) -> {
-				PageMgr.getInstance().removePage(data);
-				setData(PageMgr.getInstance().getPages());
+				mPageMgr.removePage(data);
+				setData(mPageMgr.getPages());
 			});
 		}
 
